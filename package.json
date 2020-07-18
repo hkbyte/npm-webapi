@@ -1,6 +1,6 @@
 {
   "name": "@hkbyte/webapi",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "HK Byte Library for HK WebAPI Server",
   "main": "src/index.js",
   "scripts": {
