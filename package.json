@@ -1,0 +1,38 @@
+{
+  "name": "@hkbyte/webapi",
+  "version": "0.0.1",
+  "description": "HK Byte Library for HK WebAPI Server",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publish": "np"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hkbyte/npm-webapi.git"
+  },
+  "keywords": [
+    "hkbyte",
+    "webapi",
+    "hk",
+    "server",
+    "webserver",
+    "apiserver",
+    "apigateway"
+  ],
+  "author": "Harshit Kunal LLP",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hkbyte/npm-webapi/issues"
+  },
+  "homepage": "https://github.com/hkbyte/npm-webapi#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "helmet": "^3.23.3"
+  }
+}
