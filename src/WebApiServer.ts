@@ -1,8 +1,8 @@
-import express, { Express } from 'express'
+import express, { Express, RequestHandler } from 'express'
 import bodyParser from 'body-parser'
 import cors, { CorsOptions } from 'cors'
 import helmet, { IHelmetConfiguration } from 'helmet'
-import { MiddlewareFunction, PathParams } from './types'
+import { PathParams } from './types'
 import { RequestMethod } from './enums'
 import WebApi from './WebApi'
 
@@ -54,7 +54,7 @@ export default class WebApiServer {
     /**
      * Add Middlewares
      */
-    addMiddlewares(middlewares: MiddlewareFunction[]) {
+    addMiddlewares(...middlewares: RequestHandler[]) {
         middlewares.forEach((el) => {
             this.server.use(el)
         })
@@ -63,61 +63,34 @@ export default class WebApiServer {
     /**
      * Add Routers
      */
-    addRouter(path: PathParams, middlewares: MiddlewareFunction[]) {
+    addRouter(path: PathParams, ...middlewares: RequestHandler[]) {
         this.server.use(path, ...middlewares)
     }
 
-    addWebApis(webApis: WebApi[]) {
+    addWebApis(...webApis: WebApi[]) {
         webApis.forEach((el) => {
+            const handlers = [...el.middlewares, el.integrate]
             switch (el.method) {
                 case RequestMethod.POST:
-                    this.server.post(
-                        el.endpoint,
-                        ...el.middlewares,
-                        el.integrate,
-                    )
+                    this.server.post(el.endpoint, ...handlers)
                     break
                 case RequestMethod.GET:
-                    this.server.get(
-                        el.endpoint,
-                        ...el.middlewares,
-                        el.integrate,
-                    )
+                    this.server.get(el.endpoint, ...handlers)
                     break
                 case RequestMethod.DELETE:
-                    this.server.delete(
-                        el.endpoint,
-                        ...el.middlewares,
-                        el.integrate,
-                    )
+                    this.server.delete(el.endpoint, ...handlers)
                     break
                 case RequestMethod.PATCH:
-                    this.server.patch(
-                        el.endpoint,
-                        ...el.middlewares,
-                        el.integrate,
-                    )
+                    this.server.patch(el.endpoint, ...handlers)
                     break
                 case RequestMethod.PUT:
-                    this.server.put(
-                        el.endpoint,
-                        ...el.middlewares,
-                        el.integrate,
-                    )
+                    this.server.put(el.endpoint, ...handlers)
                     break
                 case RequestMethod.HEAD:
-                    this.server.head(
-                        el.endpoint,
-                        ...el.middlewares,
-                        el.integrate,
-                    )
+                    this.server.head(el.endpoint, ...handlers)
                     break
                 default:
-                    this.server.all(
-                        el.endpoint,
-                        ...el.middlewares,
-                        el.integrate,
-                    )
+                    this.server.all(el.endpoint, ...handlers)
             }
         })
     }

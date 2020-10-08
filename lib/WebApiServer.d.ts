@@ -1,7 +1,7 @@
-import { Express } from 'express';
+import { Express, RequestHandler } from 'express';
 import { CorsOptions } from 'cors';
 import { IHelmetConfiguration } from 'helmet';
-import { MiddlewareFunction, PathParams } from './types';
+import { PathParams } from './types';
 import WebApi from './WebApi';
 declare type WebApiServerConfigs = {
     bodyLimit?: string;
@@ -21,11 +21,11 @@ export default class WebApiServer {
     /**
      * Add Middlewares
      */
-    addMiddlewares(middlewares: MiddlewareFunction[]): void;
+    addMiddlewares(...middlewares: RequestHandler[]): void;
     /**
      * Add Routers
      */
-    addRouter(path: PathParams, middlewares: MiddlewareFunction[]): void;
-    addWebApis(webApis: WebApi[]): void;
+    addRouter(path: PathParams, ...middlewares: RequestHandler[]): void;
+    addWebApis(...webApis: WebApi[]): void;
 }
 export {};

@@ -1,8 +1,9 @@
 import WebApiServer from './WebApiServer'
 import WebApi from './WebApi'
-import express from 'express'
+import sendResponseError from './sendResponseError'
+import express, { RequestHandler } from 'express'
 
-export { WebApiServer, WebApi, express }
+export { WebApiServer, WebApi, express, sendResponseError, RequestHandler }
 export * from './enums'
 export * from './types'
 export * from './errors'

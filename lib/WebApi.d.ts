@@ -1,6 +1,7 @@
 import { RequestMethod, ResponseStatus, ResponseType } from './enums';
+import { RequestHandler } from 'express';
 import { ZodObject } from 'zod';
-import { MiddlewareFunction, PathParams } from './types';
+import { PathParams } from './types';
 declare type WebApiOptions = {
     method?: RequestMethod;
     endpoint: PathParams;
@@ -11,7 +12,8 @@ declare type WebApiOptions = {
     hideErrorStack?: boolean;
     hideErrorPath?: boolean;
     hideErrorHint?: boolean;
-    handler: MiddlewareFunction;
+    middlewares?: RequestHandler[];
+    handler: RequestHandler;
 };
 export default class WebApi {
     method: RequestMethod;
@@ -23,10 +25,10 @@ export default class WebApi {
     hideErrorPath: boolean;
     hideErrorStack: boolean;
     hideErrorHint: boolean;
-    handler: MiddlewareFunction;
-    integrate: MiddlewareFunction;
-    middlewares: MiddlewareFunction[];
+    handler: RequestHandler;
+    integrate: RequestHandler;
+    middlewares: RequestHandler[];
     constructor(options: WebApiOptions);
-    addMiddlewares(middlewares: MiddlewareFunction[]): void;
+    addMiddlewares(...middlewares: RequestHandler[]): void;
 }
 export {};

@@ -1,9 +1,9 @@
 import { RequestMethod, ResponseStatus, ResponseType } from './enums'
-import { Request, Response } from 'express'
+import { RequestHandler } from 'express'
 import _ from 'lodash'
-import { ZodError, ZodObject } from 'zod'
-import { MiddlewareFunction, PathParams } from './types'
-import { ValidationError } from './errors'
+import { ZodObject } from 'zod'
+import { PathParams } from './types'
+import sendErrorResponse from './sendResponseError'
 
 type WebApiOptions = {
     method?: RequestMethod
@@ -15,7 +15,8 @@ type WebApiOptions = {
     hideErrorStack?: boolean
     hideErrorPath?: boolean
     hideErrorHint?: boolean
-    handler: MiddlewareFunction
+    middlewares?: RequestHandler[]
+    handler: RequestHandler
 }
 
 export default class WebApi {
@@ -28,9 +29,9 @@ export default class WebApi {
     hideErrorPath: boolean
     hideErrorStack: boolean
     hideErrorHint: boolean
-    handler: MiddlewareFunction
-    integrate: MiddlewareFunction
-    middlewares: MiddlewareFunction[]
+    handler: RequestHandler
+    integrate: RequestHandler
+    middlewares: RequestHandler[]
 
     constructor(options: WebApiOptions) {
         this.method = options.method || RequestMethod.POST
@@ -53,9 +54,12 @@ export default class WebApi {
             : process.env.NODE === 'production'
 
         this.handler = options.handler
-        this.middlewares = []
-        this.integrate = async (req: Request, res: Response) => {
+        this.middlewares = options.middlewares || []
+
+        this.integrate = async (req, res, next) => {
             try {
+                if (res.headersSent) return
+
                 let promisesValidators = []
                 if (!_.isUndefined(this.requestQuerySchema)) {
                     promisesValidators.push(
@@ -79,7 +83,7 @@ export default class WebApi {
 
                 const responseData = {
                     success: true,
-                    data: await this.handler(req, res),
+                    data: await this.handler(req, res, next),
                 }
 
                 const response = res.status(this.responseStatus)
@@ -95,28 +99,16 @@ export default class WebApi {
                         response.json(responseData)
                 }
             } catch (err) {
-                if (err instanceof ZodError) {
-                    err = new ValidationError(
-                        err.message,
-                        err.stack,
-                        err.flatten(),
-                    )
-                }
-                res.status(err.httpStatus || 500).json({
-                    success: false,
-                    error: {
-                        name: err.name || 'Internal Server Error',
-                        message: err.message,
-                        stack: this.hideErrorStack ? undefined : err.stack,
-                        hint: this.hideErrorHint ? undefined : err.hint,
-                        path: this.hideErrorPath ? undefined : err.path,
-                    },
+                sendErrorResponse(res, err, {
+                    hideErrorStack: this.hideErrorStack || false,
+                    hideErrorHint: this.hideErrorHint || false,
+                    hideErrorPath: this.hideErrorPath || false,
                 })
             }
         }
     }
 
-    addMiddlewares(middlewares: MiddlewareFunction[]) {
+    addMiddlewares(...middlewares: RequestHandler[]) {
         this.middlewares = middlewares
     }
 }
