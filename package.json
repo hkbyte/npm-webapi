@@ -2,7 +2,8 @@
   "name": "@hkbyte/webapi",
   "version": "2.1.0",
   "description": "HK Byte Library for HK WebAPI Server",
-  "main": "lib/index.js",
+  "main": "lib/index",
+  "types": "lib/index.d.ts",
   "scripts": {
     "test": "",
     "dev": "tsc --watch",
