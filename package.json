@@ -4,7 +4,6 @@
   "description": "HK Byte Library for HK WebAPI Server",
   "main": "lib/index",
   "types": "lib/index.d.ts",
-  "typings": "lib/index",
   "scripts": {
     "test": "",
     "dev": "tsc --watch",
@@ -16,7 +15,7 @@
     "url": "git+https://github.com/hkbyte/npm-webapi.git"
   },
   "files": [
-    "./lib/index.js"
+    "./lib"
   ],
   "keywords": [
     "hkbyte",
