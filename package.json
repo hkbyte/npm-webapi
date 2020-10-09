@@ -4,6 +4,7 @@
   "description": "HK Byte Library for HK WebAPI Server",
   "main": "lib/index",
   "types": "lib/index.d.ts",
+  "typings": "lib/index",
   "scripts": {
     "test": "",
     "dev": "tsc --watch",
