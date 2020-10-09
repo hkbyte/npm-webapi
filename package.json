@@ -14,9 +14,6 @@
     "type": "git",
     "url": "git+https://github.com/hkbyte/npm-webapi.git"
   },
-  "files": [
-    "./lib"
-  ],
   "keywords": [
     "hkbyte",
     "webapi",
