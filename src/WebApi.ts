@@ -129,8 +129,6 @@ export default class WebApi {
                 }
 
                 let files: any = undefined
-                // @ts-ignore
-                console.log(req.files)
                 if (this.requestType === RequestType.FORM_DATA_MULTIPART) {
                     if (!_.isUndefined(this.requestFileSchema)) {
                         // @ts-ignore
