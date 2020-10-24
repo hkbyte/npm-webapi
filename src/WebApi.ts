@@ -1,52 +1,92 @@
-import { RequestMethod, ResponseStatus, ResponseType } from './enums'
-import { RequestHandler } from 'express'
+import {
+    RequestMethod,
+    ResponseStatus,
+    ResponseType,
+    RequestType,
+} from './enums'
+import { RequestHandler, Request, Response } from 'express'
 import _ from 'lodash'
-import { ZodObject } from 'zod'
+import { TypeObject } from '@hkbyte/validator'
 import { PathParams } from './types'
 import sendErrorResponse from './sendResponseError'
+import expressFormData from 'express-form-data'
+import { FileObject } from './multipart/FileObject'
+
+type WebApiHandler = ({
+    body,
+    query,
+    params,
+    files,
+    locals,
+    req,
+    res,
+}: {
+    body: any
+    query: any
+    params: any
+    files: any
+    locals: any
+    req: Request
+    res: Response
+}) => Promise<any>
+
+type FormDataOptions = {
+    autoClean?: boolean
+    maxFilesSize?: number
+    uploadDir?: string
+}
 
 type WebApiOptions = {
     method?: RequestMethod
     endpoint: PathParams
-    requestQuerySchema?: ZodObject<any>
-    requestBodySchema?: ZodObject<any>
+    requestType?: RequestType
+    formDataOptions?: FormDataOptions
+    requestQuerySchema?: TypeObject
+    requestBodySchema?: TypeObject
+    requestFileSchema?: FileObject
     responseType?: ResponseType
     responseStatus?: ResponseStatus
     hideErrorStack?: boolean
     hideErrorPath?: boolean
     hideErrorHint?: boolean
     middlewares?: RequestHandler[]
-    handler: RequestHandler
+    handler: WebApiHandler
 }
 
 export default class WebApi {
     method: RequestMethod
     endpoint: PathParams
-    requestQuerySchema: ZodObject<any> | undefined
-    requestBodySchema: ZodObject<any> | undefined
+    requestType?: RequestType
+    formDataOptions?: FormDataOptions
+    requestQuerySchema?: TypeObject
+    requestBodySchema?: TypeObject
+    requestFileSchema?: FileObject
     responseType: ResponseType
     responseStatus: ResponseStatus
     hideErrorPath: boolean
     hideErrorStack: boolean
     hideErrorHint: boolean
-    handler: RequestHandler
+    handler: WebApiHandler
     integrate: RequestHandler
     middlewares: RequestHandler[]
 
     constructor(options: WebApiOptions) {
         this.method = options.method || RequestMethod.POST
         this.endpoint = options.endpoint
+        this.requestType = options.requestType || RequestType.JSON
+        this.formDataOptions = options.formDataOptions || {}
         this.requestQuerySchema = options.requestQuerySchema
         this.requestBodySchema = options.requestBodySchema
+        this.requestFileSchema = options.requestFileSchema
         this.responseType = options.responseType || ResponseType.JSON
         this.responseStatus = options.responseStatus || ResponseStatus.OK
 
-        this.hideErrorStack = _.isBoolean(options.hideErrorStack)
-            ? options.hideErrorStack
-            : false
-
         this.hideErrorPath = _.isBoolean(options.hideErrorPath)
             ? options.hideErrorPath
+            : false
+
+        this.hideErrorStack = _.isBoolean(options.hideErrorStack)
+            ? options.hideErrorStack
             : process.env.NODE === 'production'
 
         this.hideErrorHint = _.isBoolean(options.hideErrorHint)
@@ -54,7 +94,14 @@ export default class WebApi {
             : process.env.NODE === 'production'
 
         this.handler = options.handler
-        this.middlewares = options.middlewares || []
+
+        this.middlewares = []
+        if (this.requestType === RequestType.FORM_DATA_MULTIPART) {
+            this.middlewares.push(expressFormData.parse(this.formDataOptions))
+        }
+        if (options.middlewares) {
+            this.middlewares.push(...options.middlewares)
+        }
 
         this.integrate = async (req, res, next) => {
             try {
@@ -63,27 +110,48 @@ export default class WebApi {
                 let promisesValidators = []
                 if (!_.isUndefined(this.requestQuerySchema)) {
                     promisesValidators.push(
-                        this.requestQuerySchema.parseAsync(req.query),
+                        this.requestQuerySchema.parse(req.query),
                     )
                 }
                 if (!_.isUndefined(this.requestBodySchema)) {
                     promisesValidators.push(
-                        this.requestBodySchema.parseAsync(req.body),
+                        this.requestBodySchema.parse(req.body),
                     )
                 }
                 const resolves = await Promise.all(promisesValidators)
                 if (this.requestQuerySchema) {
-                    req.query = resolves[0]
+                    req.query = resolves[0] as any
                 }
                 if (this.requestBodySchema) {
                     req.query = this.requestQuerySchema
-                        ? resolves[1]
-                        : resolves[0]
+                        ? (resolves[1] as any)
+                        : (resolves[0] as any)
+                }
+
+                let files: any = undefined
+                // @ts-ignore
+                console.log(req.files)
+                if (this.requestType === RequestType.FORM_DATA_MULTIPART) {
+                    if (!_.isUndefined(this.requestFileSchema)) {
+                        // @ts-ignore
+                        files = this.requestFileSchema.parse(req.files)
+                    } else {
+                        // @ts-ignore
+                        files = req.files
+                    }
                 }
 
                 const responseData = {
                     success: true,
-                    data: await this.handler(req, res, next),
+                    data: await this.handler({
+                        body: req.body,
+                        query: req.query,
+                        files,
+                        params: req.params,
+                        locals: res.locals,
+                        req,
+                        res,
+                    }),
                 }
 
                 const response = res.status(this.responseStatus)

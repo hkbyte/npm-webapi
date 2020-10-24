@@ -6,6 +6,10 @@ export declare enum RequestMethod {
     HEAD = "HEAD",
     PUT = "PUT"
 }
+export declare enum RequestType {
+    JSON = "JSON",
+    FORM_DATA_MULTIPART = "FORM_DATA_MULTIPART"
+}
 export declare enum ResponseType {
     JSON = "JSON",
     HTML = "HTML"

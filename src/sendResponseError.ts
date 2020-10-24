@@ -1,5 +1,5 @@
 import { ValidationError } from './errors'
-import { ZodError } from 'zod'
+import { ParsingError } from '@hkbyte/validator'
 import { Response } from 'express'
 
 export default function sendErrorResponse(
@@ -15,9 +15,14 @@ export default function sendErrorResponse(
         hideErrorPath?: boolean
     },
 ) {
-    if (err instanceof ZodError) {
-        err = new ValidationError(err.message, err.stack, err.flatten())
+    if (res.headersSent) {
+        return
     }
+
+    if (err instanceof ParsingError) {
+        err = new ValidationError(err.message, err.stack, err.path)
+    }
+
     res.status(err.httpStatus || 500).json({
         success: false,
         error: {

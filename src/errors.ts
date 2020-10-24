@@ -1,6 +1,6 @@
 export class WebApiError extends Error {
     webApiErrorFlag: boolean
-    statusCode: number
+    httpStatus: number
     name: string
     path?: any
     hint?: string
@@ -9,7 +9,7 @@ export class WebApiError extends Error {
         super(message)
 
         this.webApiErrorFlag = true
-        this.statusCode = 500
+        this.httpStatus = 500
         this.name = 'WebApiError'
         this.path = undefined
         this.hint = undefined
@@ -38,7 +38,7 @@ export class UnimplementedError extends WebApiError {
         if (stack) {
             this.stack = stack
         }
-        this.statusCode = 501
+        this.httpStatus = 501
     }
 }
 
@@ -50,7 +50,7 @@ export class BadGatewayError extends WebApiError {
         if (stack) {
             this.stack = stack
         }
-        this.statusCode = 502
+        this.httpStatus = 502
     }
 }
 
@@ -63,7 +63,7 @@ export class BadRequestError extends WebApiError {
             this.stack = stack
         }
 
-        this.statusCode = 400
+        this.httpStatus = 400
     }
 }
 
@@ -79,7 +79,7 @@ export class ValidationError extends WebApiError {
             this.path = path
         }
 
-        this.statusCode = 400
+        this.httpStatus = 400
     }
 }
 
@@ -91,7 +91,7 @@ export class UnauthorisedError extends WebApiError {
         if (stack) {
             this.stack = stack
         }
-        this.statusCode = 401
+        this.httpStatus = 401
     }
 }
 
@@ -103,7 +103,7 @@ export class ForbiddenError extends WebApiError {
         if (stack) {
             this.stack = stack
         }
-        this.statusCode = 403
+        this.httpStatus = 403
     }
 }
 
@@ -115,7 +115,7 @@ export class NotFoundError extends WebApiError {
         if (stack) {
             this.stack = stack
         }
-        this.statusCode = 404
+        this.httpStatus = 404
     }
 }
 
@@ -127,7 +127,7 @@ export class AlreadyExistError extends WebApiError {
         if (stack) {
             this.stack = stack
         }
-        this.statusCode = 422
+        this.httpStatus = 422
     }
 }
 
@@ -139,7 +139,7 @@ export class InvalidArgumentError extends WebApiError {
         if (stack) {
             this.stack = stack
         }
-        this.statusCode = 422
+        this.httpStatus = 422
     }
 }
 

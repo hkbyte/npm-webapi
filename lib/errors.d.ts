@@ -1,6 +1,6 @@
 export declare class WebApiError extends Error {
     webApiErrorFlag: boolean;
-    statusCode: number;
+    httpStatus: number;
     name: string;
     path?: any;
     hint?: string;

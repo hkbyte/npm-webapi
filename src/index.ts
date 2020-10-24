@@ -8,4 +8,5 @@ export { WebApiServer, WebApi, express, sendResponseError, RequestHandler, _ }
 export * from './enums'
 export * from './types'
 export * from './errors'
-export * as zod from 'zod'
+export * from '@hkbyte/validator'
+export * from './multipart/index'
