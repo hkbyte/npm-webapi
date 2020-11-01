@@ -108,22 +108,22 @@ export default class WebApi {
                 if (res.headersSent) return
 
                 let promisesValidators = []
-                if (!_.isUndefined(this.requestQuerySchema)) {
-                    promisesValidators.push(
-                        this.requestQuerySchema.parse(req.query),
-                    )
-                }
                 if (!_.isUndefined(this.requestBodySchema)) {
                     promisesValidators.push(
                         this.requestBodySchema.parse(req.body),
                     )
                 }
-                const resolves = await Promise.all(promisesValidators)
-                if (this.requestQuerySchema) {
-                    req.query = resolves[0] as any
+                if (!_.isUndefined(this.requestQuerySchema)) {
+                    promisesValidators.push(
+                        this.requestQuerySchema.parse(req.query),
+                    )
                 }
+                const resolves = await Promise.all(promisesValidators)
                 if (this.requestBodySchema) {
-                    req.query = this.requestQuerySchema
+                    req.body = resolves[0] as any
+                }
+                if (this.requestQuerySchema) {
+                    req.query = this.requestBodySchema
                         ? (resolves[1] as any)
                         : (resolves[0] as any)
                 }
