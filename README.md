@@ -30,36 +30,15 @@ WebApiServer options:
 
 ```ts
 const server = new WebApiServer(port, {
-    cors?: boolean, // enable cors, default false
-    corsOptions?: {
-            origin?: boolean | string | RegExp | (string | RegExp)[] | CustomOrigin; // default *
-            methods?: string | string[]; // default: ['GET','HEAD','PUT','PATCH','POST','DELETE']
-            allowedHeaders?: string | string[];
-            exposedHeaders?: string | string[];
-            credentials?: boolean;
-            maxAge?: number;
-            preflightContinue?: boolean; // default false
-            optionsSuccessStatus?: number; // default 204
-    },
-    helmet?: boolean, // apply express-helmet plugin, default false,
-    helmetOptions?: {
-        contentSecurityPolicy?: boolean | IHelmetContentSecurityPolicyConfiguration;
-        dnsPrefetchControl?: boolean | IHelmetDnsPrefetchControlConfiguration;
-        featurePolicy?: IFeaturePolicyOptions;
-        frameguard?: boolean | IHelmetFrameguardConfiguration;
-        hidePoweredBy?: boolean | IHelmetHidePoweredByConfiguration;
-        hpkp?: boolean | IHelmetHpkpConfiguration;
-        hsts?: boolean | IHelmetHstsConfiguration;
-        ieNoOpen?: boolean;
-        noCache?: boolean;
-        noSniff?: boolean;
-        referrerPolicy?: boolean | IHelmetReferrerPolicyConfiguration;
-        xssFilter?: boolean | IHelmetXssFilterConfiguration;
-        expectCt?: boolean | IHelmetExpectCtConfiguration;
-        permittedCrossDomainPolicies?: boolean | IHelmetPermittedCrossDomainPoliciesConfiguration;
-    }
+    cors: boolean, // optional, default false
+    corsOptions: {}, // optional
+    helmet: true, // optional, applies express-helmet plugin to all apis, default false
+    helmetOptions: {}, // optional
 })
 ```
+
+for corsOptions refer [here](https://www.npmjs.com/package/cors#configuration-options)
+for helmetOptions refer [here](https://www.npmjs.com/package/helmet)
 
 <br>
 
